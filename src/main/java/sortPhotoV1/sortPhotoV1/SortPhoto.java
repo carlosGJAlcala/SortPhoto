@@ -50,8 +50,8 @@ public class SortPhoto
 
 		}
 		if (file.isFile()) {
-			
-			Pattern patron = Pattern.compile(".*jpg");
+
+			Pattern patron = Pattern.compile("IMG.*jpg");
 
 			Matcher m = patron.matcher(file.getCanonicalPath());
 			if (m.find()) {
@@ -69,8 +69,11 @@ public class SortPhoto
 	}
 
 	private static void moverarchivo(File file, String ndir) {
+		File comprobar=new File(ndir + "/" + file.getName());
+		if(!comprobar.exists()){
+			file.renameTo(comprobar);
 
-		file.renameTo(new File(ndir + "/" + file.getName()));
+		}
 	}
 
 	private static String creardirectorio(Date date) {
@@ -113,24 +116,14 @@ public class SortPhoto
 		
 		Date date= new Date();
 		File imagePath = new File(file.getAbsolutePath());
-		Metadata metadata;
 
-		metadata = ImageMetadataReader.readMetadata(imagePath);
-		ExifSubIFDDirectory directory = metadata.getFirstDirectoryOfType(ExifSubIFDDirectory.class);
-
-		if (directory != null) {
-
-			if (directory.getDate(ExifSubIFDDirectory.TAG_DATETIME_ORIGINAL) != null) {
-				date = (Date) directory.getDate(ExifSubIFDDirectory.TAG_DATETIME_ORIGINAL);
-			}
-		} else {
 			Calendar myCal = Calendar.getInstance();
-			String regex = "^IMG";
+			String regex = "^IMG.*";
 			Pattern patron = Pattern.compile(regex);
 			Matcher m = patron.matcher(file.getName());
 			
 			if (m.find()) {
-				regex = "^IMG-(\\d{4})(\\d{2})(\\d{2})";
+				regex = "^IMG_(\\d{4})(\\d{2})(\\d{2})";
 				patron = Pattern.compile(regex);
 				m = patron.matcher(file.getName());
 				
@@ -154,7 +147,7 @@ public class SortPhoto
 				date = myCal.getTime();
 			}
 
-		}
+
 		System.out.println(date);
 
 		return date;
